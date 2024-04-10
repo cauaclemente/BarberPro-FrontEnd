@@ -4,9 +4,25 @@ import Link from "next/link"
 
 import { Flex, Text, Center, Input, Button } from "@chakra-ui/react"
 
+import { useContext, useState } from "react"
 import logoImg from "../../../public/images/logo.svg"
+import { Authcontext } from "@/context/AuthContext"
+
+
 
 export default function Login(){
+  const { sigIn } = useContext(Authcontext);
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  async function handleLogin(){
+    await sigIn({
+      email,
+      password
+    })
+  }
+
   return(
     <>
       <Head>
@@ -33,6 +49,8 @@ export default function Login(){
             _hover={{bg: "barber.400"}}
             placeholder="email@email.com"
             type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <Input
             background="barber.400"
@@ -43,6 +61,8 @@ export default function Login(){
             _hover={{bg: "barber.400"}}
             placeholder="******"
             type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
           <Button
             background="button.cta"
@@ -50,6 +70,7 @@ export default function Login(){
             color="gray.900"
             size="lg"
             _hover={{ bg: "#ffb13e"}}
+            onClick={handleLogin}
           >
             Acessar
           </Button>
