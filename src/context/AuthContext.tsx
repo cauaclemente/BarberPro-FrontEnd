@@ -7,7 +7,9 @@ import { api } from "@/service/errors/apiClient";
 interface AuthContextData {
   user: UserProps;
   isAuthenticated: boolean;
-  sigIn: (credentials: SigInProps) => Promise<void>;
+  sigIn: (credentials: SignInProps) => Promise<void>;
+  signUp: (credentials: SignUpProps) => Promise<void>;
+  logoutUser: () => Promise<void>;
 }
 
 interface UserProps {
@@ -27,7 +29,13 @@ type AuthProviderProps = {
   children: ReactNode
 }
 
-interface SigInProps {
+interface SignInProps {
+  email: string;
+  password: string;
+}
+
+interface SignUpProps{
+  name: string;
   email: string;
   password: string;
 }
@@ -48,7 +56,7 @@ export function AuthProvider({ children }: AuthProviderProps){
   const [user, setUser] = useState<UserProps>()
   const isAuthenticated = !!user
 
-  async function sigIn({ email, password}: SigInProps){
+  async function sigIn({ email, password}: SignInProps){
     try{
       const response = await api.post('/session', {
         email,
@@ -79,8 +87,40 @@ export function AuthProvider({ children }: AuthProviderProps){
     }
   }
 
+  async function signUp({name, email, password}: SignUpProps) {
+    try{
+      const response = await api.post('/users',{
+        name,
+        email,
+        password
+      })
+
+      Router.push('/dashboard');
+
+    }catch(err){
+      console.log(err)
+    }
+  }
+
+  async function logoutUser(){
+    try{
+      destroyCookie(null, '@Barber.token', {path: "/"})
+      Router.push('/login')
+      setUser(null)
+
+    }catch{
+      alert("Erro ao deslogar")
+    }
+  }
+
   return(
-    <Authcontext.Provider value={{ user, isAuthenticated, sigIn }}>
+    <Authcontext.Provider value={{
+        user, 
+        isAuthenticated, 
+        sigIn, 
+        signUp, 
+        logoutUser 
+       }}>
       {children}
     </Authcontext.Provider>
   )
