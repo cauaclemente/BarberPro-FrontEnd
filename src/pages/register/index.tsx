@@ -1,13 +1,13 @@
 import Head from "next/head"
 import Image from "next/image"
 import Link from "next/link"
+
 import { useState, useContext } from "react"
-
-
 import { Flex, Text, Center, Input, Button } from "@chakra-ui/react"
 
 import logoImg from "../../../public/images/logo.svg"
 import { Authcontext } from "@/context/AuthContext"
+import { canSRRGuest } from "../../../utils/canSSRGuest"
 
 export default function Register(){
 
@@ -102,3 +102,10 @@ export default function Register(){
     </>
   )
 }
+
+export const getServerSideProps = canSRRGuest(async (ctx) => {
+
+  return{
+    props: {}
+  }
+})

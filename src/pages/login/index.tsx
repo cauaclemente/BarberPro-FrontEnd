@@ -3,10 +3,12 @@ import Image from "next/image"
 import Link from "next/link"
 
 import { Flex, Text, Center, Input, Button } from "@chakra-ui/react"
-
 import { useContext, useState } from "react"
-import logoImg from "../../../public/images/logo.svg"
+
 import { Authcontext } from "@/context/AuthContext"
+import logoImg from "../../../public/images/logo.svg"
+import { canSRRGuest } from "../../../utils/canSSRGuest"
+
 
 
 
@@ -17,6 +19,12 @@ export default function Login(){
   const [password, setPassword] = useState('');
 
   async function handleLogin(){
+
+    if(email === '' || password === ''){
+      alert("Preencha todos os campos")
+      return;
+    }
+
     await sigIn({
       email,
       password
@@ -84,3 +92,10 @@ export default function Login(){
     </>
   )
 }
+
+export const getServerSideProps = canSRRGuest(async (ctx) => {
+
+  return{
+    props: {}
+  }
+})
