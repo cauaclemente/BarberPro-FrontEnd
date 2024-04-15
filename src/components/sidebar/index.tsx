@@ -21,6 +21,7 @@ import {
 } from "react-icons/fi"
 import { IconType } from "react-icons";
 import Link from "next/link"; 
+import MobileNav from "./mobile";
 
 interface LinkItemProps{
   name: string;
@@ -39,12 +40,26 @@ export function Sidebar({ children}: { children: ReactNode}){
   const { isOpen, onClose, onOpen} = useDisclosure();
 
   return(
-    <Box minH="100vh" bg="barber.900">
+    <Box minH="100vh" bg="barber.900" color="white">
       <SidebarContent 
         onClose={() => onClose}
         display={{ base: 'none', md: 'block' }}
       />
-      <Box>
+      <Drawer
+        autoFocus={false}
+        isOpen={isOpen}
+        placement="left"
+        returnFocusOnClose={false}
+        onOverlayClick={onClose}
+        size="full"
+        onClose={onClose}
+      >
+        <DrawerContent>
+          <SidebarContent onClose={() => onClose()} />
+        </DrawerContent>
+      </Drawer>
+      <MobileNav display={{ base: 'flex', md: 'none'}} onOpen={onOpen} />
+      <Box ml={{ base: 0, md: 60}} p={4}>
         {children}
       </Box>
     </Box>
