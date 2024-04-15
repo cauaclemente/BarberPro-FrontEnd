@@ -14,7 +14,7 @@ export default function MobileNav({ onOpen, ...rest}: MobileProps){
       height="20"
       alignItems="center"
       color="white"
-      bg={useColorModeValue("gray.900", "gray.900")}
+      bg={useColorModeValue("barber.400", "gray.900")}
       borderBottomWidth="1px"
       borderBottomColor={useColorModeValue("barber.900", "gray.700")}
       justifyContent="flex-start"
