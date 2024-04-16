@@ -39,6 +39,27 @@ export default function Profile({ user, premium}: ProfileProps){
     await logoutUser();
   }
 
+  async function handleUpdateUser(){
+
+    if(name === ''){
+      alert("O nome não pode está vazio");
+      return;
+    }
+
+    try{
+      const apiClient = setUpAPIClient();
+      await apiClient.put('/users', {
+        name: name,
+        endereco: endereco,
+      })
+
+      alert('Dados alterados com sucesso')
+
+    }catch(err){
+      console.log(err);
+    }
+  }
+
   return(
     <>
       <Head>
@@ -108,7 +129,7 @@ export default function Profile({ user, premium}: ProfileProps){
                 mb={4}
                 bg="button.cta"
                 _hover={{ bg: '#ffb13e', color: "white"}} 
-                
+                onClick={handleUpdateUser}
               > 
                 Salvar 
               </Button>
