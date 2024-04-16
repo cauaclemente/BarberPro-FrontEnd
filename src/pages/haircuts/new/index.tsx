@@ -1,10 +1,13 @@
 import Head from "next/head";
 import Link from "next/link";
+import Router from "next/router";
+
+import { useState } from "react";
+import { FiChevronLeft } from "react-icons/fi";
 
 import { Sidebar } from "@/components/sidebar";
-import { Flex, Text, Heading, Button, useMediaQuery, Input } from "@chakra-ui/react";
+import { Flex, Text, Heading, Button, useMediaQuery, Input, Alert } from "@chakra-ui/react";
 
-import { FiChevronLeft } from "react-icons/fi";
 import { canSSRAuth } from "../../../../utils/canSSRAuth";
 import { setUpAPIClient } from "@/service/api";
 
@@ -16,6 +19,30 @@ interface NewHaircutProps{
 export default function NewHaircut({ subscription, count}: NewHaircutProps){
 
   const [isMobile] = useMediaQuery("(max-width: 640px)")
+
+  const [name, setName] = useState('')
+  const [price, setPrice] = useState('')
+
+  async function handleRegister(){
+    if(name === '' || price === ''){
+      alert("Preencha todos os dados")
+      return;
+    }
+
+    try{
+
+      const apiClient = setUpAPIClient();
+      await apiClient.post('/haircut', {
+        name: name,
+        price: Number(price)
+      })
+
+      Router.push('/haircuts')
+
+    }catch{
+      alert("Erro ao cadastrar modelo")
+    }
+  }
 
   return(
     <>
@@ -68,6 +95,8 @@ export default function NewHaircut({ subscription, count}: NewHaircutProps){
               bg="gray.900" 
               borderColor="gray"
               mb={3}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
             <Input
               placeholder="Valor do Corte ex: 34.99"
@@ -77,6 +106,8 @@ export default function NewHaircut({ subscription, count}: NewHaircutProps){
               bg="gray.900" 
               borderColor="gray"
               mb={4}
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
             />
             <Button
               w="85%"
@@ -86,6 +117,7 @@ export default function NewHaircut({ subscription, count}: NewHaircutProps){
               bg="button.cta"
               _hover={{ bg: "#ffb13e", color: "#fff" }}
               isDisabled={!subscription && count >= 3}
+              onClick={handleRegister}
             >
               Cadastrar
             </Button>
