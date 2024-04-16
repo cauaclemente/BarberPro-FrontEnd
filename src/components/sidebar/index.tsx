@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import {
-   IconButton,
    Box,
    CloseButton,
    Flex,
@@ -17,7 +16,6 @@ import {
   FiScissors,
   FiClipboard,
   FiSettings,
-  FiMenu
 } from "react-icons/fi"
 import { IconType } from "react-icons";
 import Link from "next/link"; 

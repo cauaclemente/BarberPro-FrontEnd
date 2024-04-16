@@ -36,12 +36,12 @@ export default function Haircuts(){
               Modelos de cortes
             </Heading>
             <Link href="/haircuts/new">
-              <Button>
+              <Button bg="#292934" color="#fff" _hover={{ bg: "#3a3a4a" }}>
                 Cadastrar novo
               </Button>
             </Link>
             <Stack 
-              ml={isMobile ? '0' : 'auto'}
+              ml="auto"
               mt={isMobile ? '4' : '0'}
               alignItems="center" 
               direction="row">
@@ -53,7 +53,7 @@ export default function Haircuts(){
             </Stack>
           </Flex>
           <Stack w="100%" >
-          <Link href="/haircuts/123"  >
+          <Link href="/haircuts/new"  >
             <Flex
               cursor="pointer"
               p={4}
@@ -67,12 +67,12 @@ export default function Haircuts(){
             >
               <Flex direction="row" alignItems="center" justifyContent="center">
                 <RxScissors size={28} color="#fba931" />
-                <Text fontWeight="bold" ml={4} noOfLines={2} color="white">
+                <Text fontWeight="bold" ml={4} noOfLines={2} color="white" fontSize={isMobile ? "15px" : "18"} >
                   Corte completo
                 </Text>
               </Flex>
-              <Text fontWeight="bold" color="white">
-                Preço: R$: 59.90
+              <Text fontWeight="bold" color="white" fontSize={isMobile ? "15px" : "18"}>
+                R$: 59.90
               </Text>
             </Flex>
           </Link>
