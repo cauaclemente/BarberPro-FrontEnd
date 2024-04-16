@@ -5,8 +5,15 @@ import { Sidebar } from "@/components/sidebar";
 import { Flex, Text, Heading, Button, useMediaQuery, Input } from "@chakra-ui/react";
 
 import { FiChevronLeft } from "react-icons/fi";
+import { canSSRAuth } from "../../../../utils/canSSRAuth";
+import { setUpAPIClient } from "@/service/api";
 
-export default function NewHaircut(){
+interface NewHaircutProps{
+  subscription: boolean;
+  count: number
+}
+
+export default function NewHaircut({ subscription, count}: NewHaircutProps){
 
   const [isMobile] = useMediaQuery("(max-width: 640px)")
 
@@ -78,12 +85,52 @@ export default function NewHaircut(){
               mb={6}
               bg="button.cta"
               _hover={{ bg: "#ffb13e", color: "#fff" }}
+              isDisabled={!subscription && count >= 3}
             >
               Cadastrar
             </Button>
+            {!subscription && count >= 3 && (
+              <Flex direction="row" alignItems="center" justifyContent="center">
+                <Text>
+                  Você atingiou o limite de corte.
+                </Text>
+                <Link href="/planos">
+                  <Text fontWeight="bold" color="#31fb6a" cursor="pointer" ml={1}>
+                    Seja premium
+                  </Text>
+                </Link>
+              </Flex>
+            )}
           </Flex>
         </Flex>
       </Sidebar>  
     </>
   )
 }
+
+export const getServerSideProps = canSSRAuth(async (ctx) => {
+
+  try{
+    const apiClient = setUpAPIClient(ctx)
+
+    const response = await apiClient.get('/haircut/check');
+    const count = await apiClient.get('haircut/count');
+
+    return {
+      props:{
+        subscription: response.data?.subscriptions?.status === "active" ? true : false,
+        count: count.data
+      }
+    }
+
+  }catch(err){
+    console.log(err)
+
+    return{
+      redirect:{
+        destination: "/dashboard",
+        permanent: false
+      }
+    }
+  }
+})
