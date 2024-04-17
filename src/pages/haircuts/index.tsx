@@ -1,16 +1,33 @@
 import Head from "next/head";
-import { Sidebar } from "@/components/sidebar";
 import Link from "next/link";
+import { Sidebar } from "@/components/sidebar";
 
 import { Flex, Text, Heading, Button, Stack, Switch, useMediaQuery } from "@chakra-ui/react";
 
-import { IoMdPricetag } from "react-icons/io";
+import { useState } from "react";
 import { RxScissors } from "react-icons/rx";
 
+import { canSSRAuth } from "../../../utils/canSSRAuth";
+import { setUpAPIClient } from "@/service/api";
+
+interface HaircutsItem{
+  id: string;
+  name: string;
+  price: number | string;
+  status: boolean;
+  user_id: string
+} 
+
+interface HaircutsProps{
+  haircuts: HaircutsItem[];
+}
+
  
-export default function Haircuts(){
+export default function Haircuts({haircuts}: HaircutsProps){
 
   const [isMobile] = useMediaQuery("(max-width: 640px)")
+
+  const [haircutList, setHaircutList] = useState<HaircutsItem[]>(haircuts || [])
    
   return(
     <>
@@ -52,33 +69,70 @@ export default function Haircuts(){
               />
             </Stack>
           </Flex>
-          <Stack w="100%" >
-          <Link href="/haircuts/new"  >
-            <Flex
-              cursor="pointer"
-              p={4}
-              bg="barber.400"
-              direction="row"
-              rounded="4"
-              color="white"
-              justifyContent="space-between"
-              mb={2}
-              mt={4}
-            >
-              <Flex direction="row" alignItems="center" justifyContent="center">
-                <RxScissors size={28} color="#fba931" />
-                <Text fontWeight="bold" ml={4} noOfLines={2} color="white" fontSize={isMobile ? "15px" : "18"} >
-                  Corte completo
+          {haircutList.map(haircut => (
+            <Stack w="100%" >
+            <Link key={haircut.id} href={`/haircuts/${haircut.id}`}  >
+              <Flex
+                cursor="pointer"
+                p={4}
+                bg="barber.400"
+                direction="row"
+                rounded="4"
+                color="white"
+                justifyContent="space-between"
+                mb={2}
+                mt={4}
+              >
+                <Flex direction="row" alignItems="center" justifyContent="center">
+                  <RxScissors size={28} color="#fba931" />
+                  <Text fontWeight="bold" ml={4} noOfLines={2} color="white" fontSize={isMobile ? "15px" : "18"} >
+                    {haircut.name}
+                  </Text>
+                </Flex>
+                <Text fontWeight="bold" color="white" fontSize={isMobile ? "15px" : "18"}>
+                  R$: {haircut.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </Text>
               </Flex>
-              <Text fontWeight="bold" color="white" fontSize={isMobile ? "15px" : "18"}>
-                R$: 59.90
-              </Text>
-            </Flex>
-          </Link>
-          </Stack>
+            </Link>
+            </Stack>
+          ))}
         </Flex>
       </Sidebar>
     </>
   )
 } 
+
+export const getServerSideProps = canSSRAuth(async (ctx) => {
+
+  try{
+    const apiClient = setUpAPIClient(ctx);
+    const response = await apiClient.get('/haircuts',{    
+        params:{
+          status: true
+        }
+    })
+
+    if(response.data === null){
+      return{
+        redirect:{
+          destination: "/dashboard",
+          permanent: false
+        }
+      }
+    }
+
+    return{
+      props:{
+        haircuts: response.data
+      }
+    }
+
+  }catch{
+    return{
+      redirect:{
+        destination: "/dashboard",
+        permanent: false
+      }
+    }
+  }
+})

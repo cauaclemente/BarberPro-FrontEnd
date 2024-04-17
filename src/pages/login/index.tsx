@@ -10,8 +10,6 @@ import logoImg from "../../../public/images/logo.svg"
 import { canSRRGuest } from "../../../utils/canSSRGuest"
 
 
-
-
 export default function Login(){
   const { sigIn } = useContext(Authcontext);
 
