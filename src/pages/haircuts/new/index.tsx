@@ -6,7 +6,7 @@ import { useState } from "react";
 import { FiChevronLeft } from "react-icons/fi";
 
 import { Sidebar } from "@/components/sidebar";
-import { Flex, Text, Heading, Button, useMediaQuery, Input, Alert } from "@chakra-ui/react";
+import { Flex, Text, Heading, Button, useMediaQuery, Input } from "@chakra-ui/react";
 
 import { canSSRAuth } from "../../../../utils/canSSRAuth";
 import { setUpAPIClient } from "@/service/api";
