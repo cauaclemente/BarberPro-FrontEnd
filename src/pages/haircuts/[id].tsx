@@ -7,7 +7,7 @@ import { Sidebar } from "@/components/sidebar";
 import { FiChevronLeft } from "react-icons/fi";
 import { canSSRAuth } from "../../../utils/canSSRAuth";
 import { setUpAPIClient } from "@/service/api";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 
 interface HaircutProps{
@@ -35,6 +35,42 @@ export default function EditHaircut({subscription, haircut}: EditHaircutProps){
   const [name, setName] = useState(haircut?.name)
   const [price, setPrice] = useState(haircut?.price)
   const [status, setStatus] = useState(haircut?.status)
+  const [disableHaircut, setDisableHaircut] = useState(haircut?.status ? "disabled" : "enabled")
+
+  function handleChangeStatus(e: ChangeEvent<HTMLInputElement>){
+    if(e.target.value === 'disabled'){
+      setDisableHaircut('enabled');
+      setStatus(false);
+    }else{
+      setDisableHaircut('disabled');
+      setStatus(true);
+    }
+  }
+
+async function handleUpdate(){
+
+  if(name === '' || price === ''){
+    alert("Preencha o campo")
+    return;
+  }
+
+  try{
+
+    const apiClient = setUpAPIClient();
+    await apiClient.put('/haircut', {
+      name: name,
+      price: Number(price),
+      status: status,
+      haircut_id: haircut?.id
+    })
+
+    alert("Corte atualizado com sucesso")
+    
+  }catch{
+    alert("Erro ao atualizar")
+  }
+
+}
 
   return(
     <>
@@ -100,6 +136,9 @@ export default function EditHaircut({subscription, haircut}: EditHaircutProps){
                 <Switch 
                   size="lg"
                   colorScheme="red"
+                  value={disableHaircut}
+                  isChecked={disableHaircut === 'disabled' ? false : true}
+                  onChange={( e: ChangeEvent<HTMLInputElement>) => handleChangeStatus(e)}
                 />
               </Stack>
               <Button 
@@ -108,7 +147,9 @@ export default function EditHaircut({subscription, haircut}: EditHaircutProps){
                 bg="button.cta" 
                 color="gray.900"
                  _hover={{ bg: "#ffb13e"}} 
-                 isDisabled={subscription?.status !== 'active'}>
+                isDisabled={subscription?.status !== 'active'}
+                onClick={handleUpdate}
+              >
                 Salvar
               </Button>
               {subscription?.status !== "active" && (
