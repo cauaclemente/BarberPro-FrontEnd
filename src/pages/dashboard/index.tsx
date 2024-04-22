@@ -2,13 +2,14 @@ import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
 
-import { Flex, Text, Button, Heading, Link as ChakraLink, useMediaQuery} from "@chakra-ui/react";
+import { Flex, Text, Button, Heading, Link as ChakraLink, useMediaQuery, useDisclosure} from "@chakra-ui/react";
 
 import { IoMdPerson } from "react-icons/io";
 
 import { canSSRAuth } from "../../../utils/canSSRAuth";
 import { Sidebar } from "@/components/sidebar";
 import { setUpAPIClient } from "@/service/api";
+import { ModalInfo } from "@/components/modal";
 
 export interface ScheduleItem{
   id: string;
@@ -27,8 +28,37 @@ interface DashboardProps{
 
 export default function Dashboard({ schedule }: DashboardProps){
   const [list, setList] = useState(schedule)
+  const {isOpen, onOpen, onClose} = useDisclosure();
+  const [service, setService] = useState<ScheduleItem>()
 
   const [isMobile] = useMediaQuery("(max-width: 640px)")
+
+  function handleOpenModal(item: ScheduleItem){
+   setService(item);
+   onOpen();
+  }
+
+  async function handleFinish(id: string){
+    try{
+      const apiClient = setUpAPIClient();
+      await apiClient.delete('/schedule',{
+        params:{
+          schedule_id: id
+        }
+      })
+
+      const filterItem = list.filter(item => {
+        return(item?.id !== id)
+      })
+
+      setList(filterItem)
+      onClose();
+
+    }catch{
+      onClose();
+      alert("Erro ao finalizar esse serviço");
+    }
+  }
 
   return(
     <>
@@ -48,7 +78,13 @@ export default function Dashboard({ schedule }: DashboardProps){
             </Link>
           </Flex>
           {list.map(item => (
-            <ChakraLink key={item?.id} w="100%" mr={0} p={0} mt={1} bg="transparent" style={{ textDecoration: "none"}}>
+            <ChakraLink 
+              key={item?.id} 
+              w="100%" mr={0} 
+              p={0} mt={1} 
+              bg="transparent" 
+              style={{ textDecoration: "none"}} 
+              onClick={() => handleOpenModal(item)}>
             <Flex 
               w="100%"
               direction={isMobile ? "column" : "row"}
@@ -65,13 +101,21 @@ export default function Dashboard({ schedule }: DashboardProps){
                 </Flex>
                 <Text fontWeight="bold" mb={isMobile ? 2 : 0} alignItems="flex-start">{item?.haircut?.name}</Text>
                 <Text fontWeight="bold" mb={isMobile ? 2 : 0}> 
-                R$ {item?.haircut?.price}
+                {item && item.haircut && !isNaN(Number(item.haircut.price)) ? 
+                Number(item.haircut.price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '0,00'}
                 </Text>
               </Flex>
             </ChakraLink>
           ))}
         </Flex>
       </Sidebar>
+      <ModalInfo 
+        isOpen={isOpen}
+        onOpen={onOpen}
+        onClose={onClose}
+        data={service}
+        finishService={() => handleFinish(service?.id)}
+      />
     </>
   )
 }
