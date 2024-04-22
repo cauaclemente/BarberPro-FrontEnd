@@ -1,14 +1,55 @@
 import { ChangeEvent, useState } from "react"
 
 import Head from "next/head"
+import { useRouter } from "next/router"
 
 import { Text, Flex, Heading, Button, Input, Select } from "@chakra-ui/react"
 
 import { Sidebar } from "@/components/sidebar"
+import { canSSRAuth } from "../../../utils/canSSRAuth"
+import { setUpAPIClient } from "@/service/api"
 
-export default function New(){
+interface HaircutProps{
+  id: string;
+  name: string;
+  price: string | number;
+  status: boolean;
+  user_id: string
+}
+
+interface NewProps{
+  haircuts: HaircutProps[];
+}
+
+export default function New({ haircuts }: NewProps){
 
   const [ customer, setCustomer] = useState('')
+  const [haircutSelected, setHaircutSelected] = useState(haircuts[0])
+
+  const router = useRouter()
+
+  function handleChangeSelected(id: string){
+
+    const haircutItem = haircuts.find(item => item.id === id)
+  
+    setHaircutSelected(haircutItem)
+  }
+
+  async function handleRegister(){
+    try{
+
+      const apiClient = setUpAPIClient();
+      await apiClient.post('/schedule', {
+        customer: customer,
+        haircut_id: haircutSelected?.id
+      })
+
+      router.push('/dashboard')
+
+    }catch{
+      alert("Erro ao registrar")
+    }
+  }
 
   return(
     <>
@@ -34,8 +75,10 @@ export default function New(){
               value={customer}
               onChange={(e: ChangeEvent<HTMLInputElement>) => setCustomer(e.target.value)}
             />
-            <Select mb={3} size="lg" w="85%" bg="barber.900" borderColor="gray">
-              <option key={1} value="Barba completa">Barba completa</option>
+            <Select mb={3} size="lg" w="85%" bg="barber.900" borderColor="gray" onChange={(e) => handleChangeSelected(e.target.value)}>
+              {haircuts.map(item => (
+                <option style={{background: "#1b1c29"}} key={item?.id} value={item?.id}>{item?.name}</option>
+              ))}
             </Select>
             <Button
               w="85%"
@@ -43,6 +86,7 @@ export default function New(){
               color="gray.900"
               bg="button.cta"
               _hover={{bg: "#ffb13e"}}
+              onClick={handleRegister}
             >
               Cadastrar
             </Button>
@@ -52,3 +96,40 @@ export default function New(){
     </>
   )
 }
+
+export const getServerSideProps = canSSRAuth(async(ctx) => {
+  
+  try{
+
+    const apiClient = setUpAPIClient(ctx);
+    const response = await apiClient.get('/haircuts', {
+      params:{
+        status: true
+      }
+    })
+
+    if(response.data === null){
+      return{
+        redirect:{
+          destination: '/dashboard',
+          permanent: false
+        }
+      }
+    }
+
+    return{
+      props:{
+        haircuts: response.data
+      }
+    }
+
+  }catch(err){
+    console.log(err);
+    return{
+      redirect:{
+        destination: '/dashboard',
+        permanent: false
+      }
+    }
+  }
+})
