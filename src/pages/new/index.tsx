@@ -36,6 +36,12 @@ export default function New({ haircuts }: NewProps){
   }
 
   async function handleRegister(){
+
+    if(customer === ''){
+      alert("Preencha o nome do cliente")
+      return;
+    }
+
     try{
 
       const apiClient = setUpAPIClient();

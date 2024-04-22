@@ -125,7 +125,7 @@ export default function Haircuts({haircuts}: HaircutsProps){
                   </Text>
                 </Flex>
                 <Text fontWeight="bold" color="white" fontSize={isMobile ? "15px" : "18"}>
-                  R$: {haircut.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                 {haircut.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </Text>
               </Flex>
             </Link>
