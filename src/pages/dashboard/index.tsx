@@ -68,7 +68,7 @@ export default function Dashboard({ schedule }: DashboardProps){
       <Sidebar>
         <Flex direction="column" alignItems="flex-start" justifyContent="flex-start">
           <Flex w="100%" direction="row" alignItems="center" justifyContent="flex-start">
-            <Heading fontSize="3xl" mt={4} mb={4} mr={4}>
+            <Heading fontSize="3xl" mt={4} mb={4} mr={4} color="orange.900">
               Agenda
             </Heading>
             <Link href="/new">

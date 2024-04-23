@@ -116,7 +116,7 @@ export default function Haircuts({haircuts}: HaircutsProps){
                 color="white"
                 justifyContent="space-between"
                 mb={2}
-                mt={4}
+                mt={1}
               >
                 <Flex direction="row" alignItems="center" justifyContent="center">
                   <RxScissors size={28} color="#fba931" />
@@ -125,7 +125,7 @@ export default function Haircuts({haircuts}: HaircutsProps){
                   </Text>
                 </Flex>
                 <Text fontWeight="bold" color="white" fontSize={isMobile ? "15px" : "18"}>
-                 {haircut.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  {haircut.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </Text>
               </Flex>
             </Link>

@@ -9,8 +9,14 @@ import {
  } from "@chakra-ui/react";
 
  import { Sidebar } from "@/components/sidebar";
+import { canSSRAuth } from "../../../utils/canSSRAuth";
+import { setUpAPIClient } from "@/service/api";
 
- export default function Planos(){
+interface PlanosProps{
+  premium: boolean;
+}
+
+ export default function Planos({ premium }: PlanosProps){
 
   const [isMobile] = useMediaQuery('(max-width: 640px)')
 
@@ -47,9 +53,24 @@ import {
               <Text fontWeight="medium" ml={4} mb={2}>Editar modelos de cortes.</Text>
               <Text fontWeight="medium" ml={4} mb={2}>Receber todas as atualizações.</Text>
               <Text fontWeight="bold" color="#31fb6a" fontSize="2xl" ml={4} mb={2}>R$ 14.99</Text>
-              <Button bg="button.cta" _hover={{ bg: '#ff9900', color: "#000", transition: "1s all"}} m="2" color="white" onClick={() => {}}>
-              VIRAR PREMIUM
+              <Button 
+                bg="#ff9900"
+                color="#000" 
+                _hover={{ bg: 'button.cta', transition: "1s all"}} 
+                m={2}  
+                isDisabled={premium}
+                onClick={() => {}}>
+              {premium ? (
+                "VOCÊ JÁ É PREMIUM"
+              ): (
+                "VIRAR PREMIUM"
+              )}
               </Button>
+              {premium && (
+                <Button m={2} bg="white" color="black" _hover={{ bg: "#eee8e8" }} fontWeight="bold" onClick={() => {}}>
+                  ALTERAR ASSINATURA
+                </Button>
+              )}
             </Flex>
           </Flex>
         </Flex>
@@ -57,3 +78,25 @@ import {
     </>
   )
  }
+
+ export const getServerSideProps = canSSRAuth(async(ctx) => {
+  
+  try{
+    const apiClient = setUpAPIClient(ctx);
+    const response = await apiClient.get("/me")
+
+    return{
+      props:{
+        premium: response.data?.subscriptions?.status === 'active' ? true : false
+      }
+    }
+
+  }catch{
+    return{
+      redirect:{
+        destination: '/dashboard',
+        permanent: false
+      }
+    }
+  }
+ })
