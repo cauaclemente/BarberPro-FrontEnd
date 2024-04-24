@@ -8,9 +8,11 @@ import {
   Heading
  } from "@chakra-ui/react";
 
- import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "@/components/sidebar";
 import { canSSRAuth } from "../../../utils/canSSRAuth";
 import { setUpAPIClient } from "@/service/api";
+
+import { getStripeJS } from "../../service/stripe-js"
 
 interface PlanosProps{
   premium: boolean;
@@ -19,6 +21,26 @@ interface PlanosProps{
  export default function Planos({ premium }: PlanosProps){
 
   const [isMobile] = useMediaQuery('(max-width: 640px)')
+
+  const handleSubscribe = async() => {
+    if(premium){
+      return;
+    }
+
+    try{
+      const apiClient = setUpAPIClient();
+      const response = await apiClient.post('/subscribe')
+
+      const { sessionId } = response.data;
+
+      const stripe = await getStripeJS()
+      await stripe.redirectToCheckout({sessionId: sessionId})
+
+
+    }catch(err){
+      console.log(err)
+    }
+  }
 
   return(
     <>
@@ -59,7 +81,7 @@ interface PlanosProps{
                 _hover={{ bg: 'button.cta', transition: "1s all"}} 
                 m={2}  
                 isDisabled={premium}
-                onClick={() => {}}>
+                onClick={handleSubscribe}>
               {premium ? (
                 "VOCÊ JÁ É PREMIUM"
               ): (
